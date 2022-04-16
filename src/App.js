@@ -1,8 +1,10 @@
 import React from "react";
+import Home from "./Components/Home"
+import "antd/dist/antd.css";
 
 const App = () => ( 
-    <div>
-        <h1>Hello World</h1>
+    <div id='app'>
+        <Home />
     </div>
 );
 
