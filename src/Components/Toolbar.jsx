@@ -1,24 +1,31 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Button, Modal } from "antd";
 import UserAvatar from "./Avatar";
 import ProfileForm from "./ProfileForm";
+import AuthProvider from "../auth/auth";
+import { useSelector } from "react-redux";
+import firebase from "firebase/app";
 
 const ToolBar = () => {
   const [visible, setVisible] = React.useState(false);
   const [confirmLoading, setConfirmLoading] = React.useState(false);
   const [modalText, setModalText] = React.useState("Content of the modal");
 
+  const { user } = AuthProvider();
+  const profileData = useSelector((state) => state.profileData);
+  
   const showModal = () => {
     setVisible(true);
   };
 
+  useEffect(() => {
+    if (user && profileData.name === '') {
+      setVisible(true);
+    }
+  }, [user])
+
   const handleOk = () => {
-    setModalText("The modal will be closed after two seconds");
     setConfirmLoading(true);
-    // setTimeout(() => {
-    //   setVisible(false);
-    //   setConfirmLoading(false);
-    // }, 2000);
   };
 
   const handleCancel = () => {

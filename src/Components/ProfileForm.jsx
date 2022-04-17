@@ -1,7 +1,8 @@
 import React, { useEffect } from "react";
 import { Form, Input, Button, Select, Upload } from "antd";
 import { useSelector, useDispatch } from "react-redux";
-import { signout } from "../actions";
+import { saveProfile } from "../actions";
+import AuthProvider from "../auth/auth";
 
 const { Option } = Select;
 
@@ -13,44 +14,57 @@ const layout = {
 const ProfileForm = () => {
   const [form] = Form.useForm();
   const profileData = useSelector((state) => state.profileData);
+  const { signOut } = AuthProvider();
+
   const dispatch = useDispatch();
-  
+
+  const { user } = AuthProvider();
   useEffect(() => {
-    const { name, gender, status } = profileData
+    const { name, gender, status } = profileData;
     form.setFieldsValue({
       name: name,
       gender: gender,
-      status: status
+      status: status,
     });
-  }, [])
+  }, []);
 
   const onNameChange = (e) => {
-    console.log(e.target.value)
-  }
+    console.log(e.target.value);
+    dispatch(
+      saveProfile("SAVE_PROFILE", { ...profileData, name: e.target.value })
+    );
+  };
 
   const onStatusChange = (e) => {
-    console.log(e.target.value)
-  }
+    console.log(e.target.value);
+    dispatch(
+      saveProfile("SAVE_PROFILE", { ...profileData, status: e.target.value })
+    );
+  };
 
   const onGenderChange = (value) => {
-    switch (value) {
-      case "male":
-        // form.setFieldsValue({ note: "Hi, man!" });
-        return;
-      case "female":
-        // form.setFieldsValue({ note: "Hi, lady!" });
-        return;
-      case "other":
-        // form.setFieldsValue({ note: "Hi there!" });
-    }
+    console.log(value)
+    dispatch(
+      saveProfile("SAVE_PROFILE", { ...profileData, gender: value })
+    );
+    // switch (value) {
+    //   case "male":
+    //     // form.setFieldsValue({ note: "Hi, man!" });
+    //     return;
+    //   case "female":
+    //     // form.setFieldsValue({ note: "Hi, lady!" });
+    //     return;
+    //   case "other":
+    //   // form.setFieldsValue({ note: "Hi there!" });
+    // }
   };
 
   const onImageChange = (e) => {
     console.log(e.fileList[0]);
-  }
+  };
 
   const onFinish = (values) => {
-    console.log('here' + values);
+    // console.log('here' + values);
   };
 
   const onReset = () => {
@@ -70,7 +84,7 @@ const ProfileForm = () => {
         <Input onChange={onNameChange} />
       </Form.Item>
       <Form.Item name="status" label="Status" rules={[{ required: true }]}>
-        <Input onChange={onStatusChange}/>
+        <Input onChange={onStatusChange} />
       </Form.Item>
       <Form.Item name="image" label="Image">
         <Upload onChange={onImageChange}>
@@ -88,7 +102,7 @@ const ProfileForm = () => {
           <Option value="other">Other</Option>
         </Select>
       </Form.Item>
-      <Button onClick={() => dispatch(signout())}>Logout</Button>
+      <Button onClick={() => signOut()}>Logout</Button>
     </Form>
   );
 };
