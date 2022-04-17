@@ -1,9 +1,12 @@
 import React from "react";
+import { useSelector } from "react-redux";
 
 const UserAvatar = () => {
+    const profileData = useSelector((state) => state.profileData);
+    
     return (
         <span className="user-avatar">
-            <img src="https://images.pexels.com/photos/775358/pexels-photo-775358.jpeg?auto=compress&cs=tinysrgb&w=600" 
+            <img src={profileData.image} 
                 alt="" 
             />
         </span>

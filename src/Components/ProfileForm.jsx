@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Form, Input, Button, Select, Upload } from "antd";
-// import { UploadOutlined } from '@ant-design/icons';
+import { useSelector, useDispatch } from "react-redux";
+import { signout } from "../actions";
 
 const { Option } = Select;
 
@@ -9,21 +10,19 @@ const layout = {
   wrapperCol: { span: 16 },
 };
 
-const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
-};
-
-// const props = {
-//   action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
-//   onChange({ file, fileList }) {
-//     if (file.status !== 'uploading') {
-//       console.log(file, fileList);
-//     }
-//   },
-// };
-
 const ProfileForm = () => {
   const [form] = Form.useForm();
+  const profileData = useSelector((state) => state.profileData);
+  const dispatch = useDispatch();
+  
+  useEffect(() => {
+    const { name, gender, status } = profileData
+    form.setFieldsValue({
+      name: name,
+      gender: gender,
+      status: status
+    });
+  }, [])
 
   const onNameChange = (e) => {
     console.log(e.target.value)
@@ -36,13 +35,13 @@ const ProfileForm = () => {
   const onGenderChange = (value) => {
     switch (value) {
       case "male":
-        form.setFieldsValue({ note: "Hi, man!" });
+        // form.setFieldsValue({ note: "Hi, man!" });
         return;
       case "female":
-        form.setFieldsValue({ note: "Hi, lady!" });
+        // form.setFieldsValue({ note: "Hi, lady!" });
         return;
       case "other":
-        form.setFieldsValue({ note: "Hi there!" });
+        // form.setFieldsValue({ note: "Hi there!" });
     }
   };
 
@@ -89,6 +88,7 @@ const ProfileForm = () => {
           <Option value="other">Other</Option>
         </Select>
       </Form.Item>
+      <Button onClick={() => dispatch(signout())}>Logout</Button>
     </Form>
   );
 };

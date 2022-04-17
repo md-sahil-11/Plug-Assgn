@@ -1,5 +1,5 @@
 import React from "react";
-import { Row, Col, Divider, Card } from "antd";
+import { Row, Col, Divider, Card, Button } from "antd";
 import UserAvatar from "./Avatar";
 
 const { Meta } = Card;
@@ -12,12 +12,18 @@ const ProfileBody = () => {
         // style={{ width: 240 }}
         cover={
           <img
-            alt="example"
+            alt=""
             src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png"
           />
         }
       >
         <Meta title="Europe Street beat" description="www.instagram.com" />
+        <br />
+        <div className="d-flex">
+          <Button>{0} Likes</Button>
+          <Button>{0} Unlikes</Button>
+          <Button>Favourite</Button>
+        </div>
       </Card>
     </div>
   );

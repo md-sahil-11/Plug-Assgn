@@ -16,3 +16,15 @@ export const signout = () => {
         type: 'SIGN_OUT'
     }
 }
+
+export const loading = () => {
+    return {
+        type: 'LOADING'
+    }
+}
+
+export const loaded = () => {
+    return {
+        type: 'LOADED'
+    }
+}
