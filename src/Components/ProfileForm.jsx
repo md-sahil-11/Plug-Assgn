@@ -1,7 +1,6 @@
 import React from "react";
 import { Form, Input, Button, Select, Upload } from "antd";
 // import { UploadOutlined } from '@ant-design/icons';
-import UserAvatar from "./Avatar";
 
 const { Option } = Select;
 
@@ -9,21 +8,30 @@ const layout = {
   labelCol: { span: 8 },
   wrapperCol: { span: 16 },
 };
+
 const tailLayout = {
   wrapperCol: { offset: 8, span: 16 },
 };
 
-const props = {
-  action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
-  onChange({ file, fileList }) {
-    if (file.status !== 'uploading') {
-      console.log(file, fileList);
-    }
-  },
-};
+// const props = {
+//   action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
+//   onChange({ file, fileList }) {
+//     if (file.status !== 'uploading') {
+//       console.log(file, fileList);
+//     }
+//   },
+// };
 
 const ProfileForm = () => {
   const [form] = Form.useForm();
+
+  const onNameChange = (e) => {
+    console.log(e.target.value)
+  }
+
+  const onStatusChange = (e) => {
+    console.log(e.target.value)
+  }
 
   const onGenderChange = (value) => {
     switch (value) {
@@ -39,11 +47,11 @@ const ProfileForm = () => {
   };
 
   const onImageChange = (e) => {
-    console.log(e)
+    console.log(e.fileList[0]);
   }
 
   const onFinish = (values) => {
-    console.log(values);
+    console.log('here' + values);
   };
 
   const onReset = () => {
@@ -60,10 +68,10 @@ const ProfileForm = () => {
   return (
     <Form {...layout} form={form} name="control-hooks" onFinish={onFinish}>
       <Form.Item name="name" label="Name" rules={[{ required: true }]}>
-        <Input />
+        <Input onChange={onNameChange} />
       </Form.Item>
       <Form.Item name="status" label="Status" rules={[{ required: true }]}>
-        <Input />
+        <Input onChange={onStatusChange}/>
       </Form.Item>
       <Form.Item name="image" label="Image">
         <Upload onChange={onImageChange}>
@@ -76,9 +84,9 @@ const ProfileForm = () => {
           onChange={onGenderChange}
           allowClear
         >
-          <Option value="male">male</Option>
-          <Option value="female">female</Option>
-          <Option value="other">other</Option>
+          <Option value="male">Male</Option>
+          <Option value="female">Female</Option>
+          <Option value="other">Other</Option>
         </Select>
       </Form.Item>
     </Form>
