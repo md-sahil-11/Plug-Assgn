@@ -23,7 +23,8 @@ firebase.initializeApp({
   appId: "1:498965248115:web:557a62f7fc7ce6c67e1206"
 })
 
-const store = createStore(allReducers);
+const store = createStore(allReducers,
+  window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
 
 const App = () => (
   

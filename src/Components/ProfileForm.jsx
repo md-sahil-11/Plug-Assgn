@@ -3,6 +3,7 @@ import { Form, Input, Button, Select, Upload } from "antd";
 import { useSelector, useDispatch } from "react-redux";
 import { saveProfile } from "../actions";
 import AuthProvider from "../auth/auth";
+import Api from "../utils/api";
 
 const { Option } = Select;
 

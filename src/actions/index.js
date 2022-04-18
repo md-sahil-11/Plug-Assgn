@@ -28,3 +28,16 @@ export const loaded = () => {
         type: 'LOADED'
     }
 }
+
+export const saveId = (id) => {
+    return {
+        type: 'SAVE_ID',
+        payload: id
+    }
+}
+
+export const deleteId = () => {
+    return {
+        type: 'DELETE_ID'
+    }
+}

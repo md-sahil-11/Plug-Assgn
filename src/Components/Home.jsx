@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Row, Col, Divider } from "antd";
 import Toolbar from "./Toolbar";
 import ProfileBody from "./ProfileBody";
@@ -7,6 +7,7 @@ import LoginPage from "./LoginPage";
 import Spinner from "./Spinner";
 import { signin, saveProfile, loaded, loading } from "../actions";
 import AuthProvider from "../auth/auth";
+import Api from "../utils/api";
 // import firebase from 'firebase/app';
 // import 'firebase/firestore';
 // import 'firebase/auth';
@@ -29,6 +30,16 @@ const Home = () => {
 
   // const [user] = useAuthState(auth);
   const { user } = AuthProvider();
+  const { getAllUser } = Api();
+  // const list = getAllUser();
+
+  const [userList, setUserList] = useState({});
+
+  useEffect(() => {
+    const list = getAllUser();
+
+    setUserList(list);
+  }, [])
 
   const isLogged = useSelector((state) => state.isLogged);
   const isLoading = useSelector((state) => state.isLoading);
@@ -60,7 +71,7 @@ const Home = () => {
 
   return (
     <>
-      {isLogged ? (
+      {(isLogged) ? (
         <>
           {isLoading ? (
             <div className="d-flex-hz">
@@ -72,9 +83,9 @@ const Home = () => {
                 <h2>Hi, {profileData.name}</h2>
                 <Divider />
                 <Row gutter={[16, { xs: 8, sm: 16, md: 24, lg: 32 }]}>
-                  {["", "", ""].map((item, idx) => (
-                    <Col key={idx} xs={24} sm={12} className="gutter-row">
-                      <ProfileBody />
+                  {Object.entries(userList)?.map(([key, val]) => (
+                    <Col key={key} xs={24} sm={12} className="gutter-row">
+                      {Object.keys(userList).length && <ProfileBody />}
                     </Col>
                   ))}
                 </Row>

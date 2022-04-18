@@ -5,23 +5,37 @@ import $ from "jquery";
 import { useDispatch } from "react-redux";
 import { signin, signout, saveProfile, loaded, loading } from "../actions";
 
+import Api from "../utils/api";
+
 const AuthProvider = () => {
   const auth = firebase.auth();
   const dispatch = useDispatch();
 
-   const [user] = useAuthState(auth);
+  const { addUser } = Api();
 
-   const signInWithGoogle = () => {
+  const [user] = useAuthState(auth);
+
+  const signInWithGoogle = () => {
+    dispatch(loading());
     const provider = new firebase.auth.GoogleAuthProvider();
-    auth.signInWithPopup(provider);
+    auth
+      .signInWithPopup(provider)
+      .then(function (result) {
+        // var uid = result.user.uid;
+        dispatch(loaded());
+      })
+      .catch(function (error) {
+        // An error occurred
+      });
   };
 
-   const signOut = () => {
-       if (user) auth.signOut();
-       else dispatch(signout());
+  const signOut = () => {
+    if (user) auth.signOut();
+    dispatch(signout());
   };
 
-   const signInWithRandomProfile = () => {
+  const signInWithRandomProfile = () => {
+    dispatch(loading());
     dispatch(signin());
 
     if ("user_profile" in window.localStorage) {
@@ -44,13 +58,13 @@ const AuthProvider = () => {
           image: picture.medium,
         };
         console.log(profileData);
-
         //storing anonymous profile in localstorage
         window.localStorage.setItem(
           "user_profile",
           JSON.stringify(profileData)
         );
         dispatch(saveProfile(profileData));
+        addUser(profileData);
       },
     });
   };
@@ -59,8 +73,8 @@ const AuthProvider = () => {
     signInWithGoogle,
     signInWithRandomProfile,
     signOut,
-    user
-  }
+    user,
+  };
 };
 
 export default AuthProvider;
