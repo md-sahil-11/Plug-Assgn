@@ -1,27 +1,23 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Row, Col, Divider, Card, Button } from "antd";
 import UserAvatar from "./Avatar";
+import { useSelector } from "react-redux";
 
 const { Meta } = Card;
 
-const ProfileBody = () => {
+const ProfileBody = (props) => {
+  const profileData = useSelector((state) => state.profileData);
+  useEffect(() => {
+    console.log(props.id, profileData["user_id"]);
+  }, []);
   return (
     <div>
-      <Card
-        hoverable
-        // style={{ width: 240 }}
-        cover={
-          <img
-            alt=""
-            src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png"
-          />
-        }
-      >
-        <Meta title="Europe Street beat" description="www.instagram.com" />
+      <Card hoverable cover={<img alt="" src={props.image !== ""? props.image: "https://icon-library.com/images/default-user-icon/default-user-icon-7.jpg" } />}>
+        <Meta title={props.name} description={props.status} />
         <br />
         <div className="d-flex">
-          <Button>{0} Likes</Button>
-          <Button>{0} Unlikes</Button>
+          <Button>{props.likes} Likes</Button>
+          <Button>{props.unlikes} Unlikes</Button>
           <Button>Favourite</Button>
         </div>
       </Card>
@@ -30,17 +26,3 @@ const ProfileBody = () => {
 };
 
 export default ProfileBody;
-
-// <div className="status-body">
-//   <Row>
-//     <Col span={6}>
-//       <UserAvatar />
-//     </Col>
-//     <Col span={18}>
-//         <p>
-//             Lorem ipsum, dolor sit amet consectetur adipisicing elit. Obcaecati dolorem beatae, tempora placeat quas deleniti corporis vero dolore assumenda! Placeat incidunt nostrum ipsam quidem beatae!
-//         </p>
-//         <Divider />
-//     </Col>
-//   </Row>
-// </div>

@@ -1,9 +1,11 @@
-import React, { useEffect } from "react";
-import { Form, Input, Button, Select, Upload } from "antd";
+import React, { useEffect, useState } from "react";
+import { Form, Input, Button, Select, Upload, message } from "antd";
 import { useSelector, useDispatch } from "react-redux";
-import { saveProfile } from "../actions";
+import { saveProfile, saveId, loaded, loading } from "../actions";
 import AuthProvider from "../auth/auth";
 import Api from "../utils/api";
+import firebase from "firebase/app";
+import "firebase/storage";
 
 const { Option } = Select;
 
@@ -12,72 +14,101 @@ const layout = {
   wrapperCol: { span: 16 },
 };
 
-const ProfileForm = () => {
+const tailLayout = {
+  wrapperCol: { offset: 8, span: 16 },
+};
+
+const ProfileForm = ({ setVisible }) => {
+  const [imageUrl, setImageUrl] = useState("");
+  const [imageUploading, setImageUploading] = useState(false);
   const [form] = Form.useForm();
   const profileData = useSelector((state) => state.profileData);
-  const { signOut } = AuthProvider();
-
+  const { signOut, user } = AuthProvider();
+  const { addUser, getUser, updateUser } = Api();
   const dispatch = useDispatch();
 
-  const { user } = AuthProvider();
   useEffect(() => {
-    const { name, gender, status } = profileData;
+    const { name, gender, status, image } = profileData;
+    console.log(profileData);
     form.setFieldsValue({
       name: name,
       gender: gender,
       status: status,
     });
+
+    setImageUrl(image);
   }, []);
+
+  useEffect(() => {
+    if (user) {
+      getUser(user.uid).then((res) => {
+        const { name, status, gender } = res;
+        console.log(res);
+        form.setFieldsValue({
+          name: name,
+          gender: gender,
+          status: status,
+        });
+      });
+    }
+  }, [user]);
 
   const onNameChange = (e) => {
     console.log(e.target.value);
-    dispatch(
-      saveProfile("SAVE_PROFILE", { ...profileData, name: e.target.value })
-    );
   };
 
   const onStatusChange = (e) => {
     console.log(e.target.value);
-    dispatch(
-      saveProfile("SAVE_PROFILE", { ...profileData, status: e.target.value })
-    );
   };
 
   const onGenderChange = (value) => {
-    console.log(value)
-    dispatch(
-      saveProfile("SAVE_PROFILE", { ...profileData, gender: value })
-    );
-    // switch (value) {
-    //   case "male":
-    //     // form.setFieldsValue({ note: "Hi, man!" });
-    //     return;
-    //   case "female":
-    //     // form.setFieldsValue({ note: "Hi, lady!" });
-    //     return;
-    //   case "other":
-    //   // form.setFieldsValue({ note: "Hi there!" });
-    // }
+    console.log(value);
   };
 
   const onImageChange = (e) => {
-    console.log(e.fileList[0]);
+    console.log(e);
+    let file = e.file;
+    console.log(file);
+    setImageUploading(true);
+    const ref = firebase.storage().ref(`/images/${file.name}`);
+    const uploadTask = ref.put(e.file.originFileObj);
+    uploadTask.on("state_changed", console.log, console.error, () => {
+      ref.getDownloadURL().then((url) => {
+        console.log(url);
+        setImageUrl(url);
+        setImageUploading(false);
+        message.info("Image has been uploaded.");
+      });
+    });
   };
 
   const onFinish = (values) => {
-    // console.log('here' + values);
+    if (imageUploading) {
+      message.success("Wait image is getting uploaded.");
+      return;
+    }
+    console.log(values);
+    const { name, gender, status, image } = values;
+    const data = {
+      name,
+      gender,
+      status,
+      image: imageUrl,
+    };
+    if (name !== "" && gender !== "" && status !== "") {
+      updateUser(data).then((res) => {
+        console.log(res);
+      });
+      setVisible(false);
+    }
+    dispatch(saveProfile(data));
   };
 
   const onReset = () => {
     form.resetFields();
   };
 
-  const onFill = () => {
-    form.setFieldsValue({
-      note: "Hello world!",
-      gender: "male",
-    });
-  };
+  const onFill = () => {};
 
   return (
     <Form {...layout} form={form} name="control-hooks" onFinish={onFinish}>
@@ -103,7 +134,18 @@ const ProfileForm = () => {
           <Option value="other">Other</Option>
         </Select>
       </Form.Item>
-      <Button onClick={() => signOut()}>Logout</Button>
+      <Form.Item {...tailLayout}>
+        <Button type="primary" htmlType="submit">
+          Submit
+        </Button>
+        <Button htmlType="button" onClick={onReset}>
+          Reset
+        </Button>
+        {/* <Button type="link" htmlType="button" onClick={onFill}>
+          Fill form
+        </Button> */}
+        <Button onClick={() => signOut()}>Logout</Button>
+      </Form.Item>
     </Form>
   );
 };

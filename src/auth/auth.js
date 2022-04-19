@@ -3,7 +3,14 @@ import firebase from "firebase/app";
 import { useAuthState } from "react-firebase-hooks/auth";
 import $ from "jquery";
 import { useDispatch } from "react-redux";
-import { signin, signout, saveProfile, loaded, loading } from "../actions";
+import {
+  signin,
+  signout,
+  saveProfile,
+  loaded,
+  loading,
+  saveId,
+} from "../actions";
 
 import Api from "../utils/api";
 
@@ -21,11 +28,26 @@ const AuthProvider = () => {
     auth
       .signInWithPopup(provider)
       .then(function (result) {
-        // var uid = result.user.uid;
-        dispatch(loaded());
+
+        var uid = result.user.uid;
+        console.log('UID', uid);
+        dispatch(signin());
+        const profileData = {
+          name: "User",
+          status: "Feeling Good",
+          gender: "",
+          image: "https://icon-library.com/images/default-user-icon/default-user-icon-7.jpg",
+          user_id: uid,
+        };
+        addUser(profileData).then(res => {
+          dispatch(saveProfile(profileData));
+          dispatch(signin());
+          dispatch(loaded());
+        })
       })
       .catch(function (error) {
         // An error occurred
+        alert("Something went wrong!");
       });
   };
 
@@ -36,11 +58,11 @@ const AuthProvider = () => {
 
   const signInWithRandomProfile = () => {
     dispatch(loading());
-    dispatch(signin());
 
     if ("user_profile" in window.localStorage) {
       console.log(window.localStorage["user_profile"]);
       dispatch(saveProfile(JSON.parse(window.localStorage["user_profile"])));
+      dispatch(signin());
       dispatch(loaded());
       return;
     }
@@ -49,22 +71,33 @@ const AuthProvider = () => {
       url: "https://randomuser.me/api/",
       dataType: "json",
       success: function (data) {
-        dispatch(loaded());
+        
         const { name, gender, picture } = data.results[0];
         const profileData = {
           name: `${name.title} ${name.first} ${name.last}`,
           status: "Feeling Good",
           gender: gender,
-          image: picture.medium,
+          image: picture.large,
         };
         console.log(profileData);
         //storing anonymous profile in localstorage
-        window.localStorage.setItem(
-          "user_profile",
-          JSON.stringify(profileData)
-        );
+
         dispatch(saveProfile(profileData));
-        addUser(profileData);
+        addUser(profileData)
+          .then((res) => {
+            console.log(res);
+            dispatch(saveId(res));
+            profileData["user_id"] = res;
+            window.localStorage.setItem(
+              "user_profile",
+              JSON.stringify(profileData)
+            );
+            dispatch(signin());
+            dispatch(loaded());
+          })
+          .catch((err) => {
+            alert("Something went wrong!");
+          });
       },
     });
   };

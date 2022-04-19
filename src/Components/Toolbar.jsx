@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Button, Modal } from "antd";
+import { Button, Modal, message } from "antd";
 import UserAvatar from "./Avatar";
 import ProfileForm from "./ProfileForm";
 import AuthProvider from "../auth/auth";
@@ -19,9 +19,9 @@ const ToolBar = () => {
   };
 
   useEffect(() => {
-    if (user && profileData.name === '') {
-      setVisible(true);
-    }
+    // if (user) {
+      // setVisible(true);
+    // }
   }, [user])
 
   const handleOk = () => {
@@ -29,8 +29,12 @@ const ToolBar = () => {
   };
 
   const handleCancel = () => {
+    const { name, gender, status } = profileData;
     console.log("Clicked cancel button");
+    // if (name !== '' && gender !== '' && status !== '') 
     setVisible(false);
+
+    // else message.error("Set up your account first.")
   };
 
   return (
@@ -58,8 +62,9 @@ const ToolBar = () => {
         onOk={handleOk}
         confirmLoading={confirmLoading}
         onCancel={handleCancel}
+        footer={null}
       >
-        <ProfileForm />
+        <ProfileForm setVisible={setVisible}/>
       </Modal>
     </div>
   );

@@ -3,7 +3,6 @@ const data = {
     status: '',
     gender: '',
     image: '',
-    id: '',
 }
 
 const profileDataReducer = (state = data, action) => {

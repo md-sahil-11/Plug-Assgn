@@ -6,7 +6,7 @@ const UserAvatar = () => {
     
     return (
         <span className="user-avatar">
-            <img src={profileData.image} 
+            <img src={(profileData.image !== "" || profileData.image) ? profileData.image : "https://icon-library.com/images/default-user-icon/default-user-icon-7.jpg"} 
                 alt="" 
             />
         </span>
