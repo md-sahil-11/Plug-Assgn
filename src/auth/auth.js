@@ -18,7 +18,7 @@ const AuthProvider = () => {
   const auth = firebase.auth();
   const dispatch = useDispatch();
 
-  const { addUser } = Api();
+  const { addUser, getUser } = Api();
 
   const [user] = useAuthState(auth);
 
@@ -28,25 +28,41 @@ const AuthProvider = () => {
     auth
       .signInWithPopup(provider)
       .then(function (result) {
-
         var uid = result.user.uid;
-        console.log('UID', uid);
+        console.log("UID", uid);
         dispatch(signin());
-        const profileData = {
-          name: "User",
-          status: "Feeling Good",
-          gender: "",
-          image: "https://icon-library.com/images/default-user-icon/default-user-icon-7.jpg",
-          user_id: uid,
-        };
-        addUser(profileData).then(res => {
-          dispatch(saveProfile(profileData));
-          dispatch(signin());
-          dispatch(loaded());
-        })
+        getUser(uid).then((res) => {
+          let profileData = {
+            name: "User",
+            status: "Feeling Good",
+            gender: "",
+            image:
+              "https://icon-library.com/images/default-user-icon/default-user-icon-7.jpg",
+            user_id: uid,
+          };
+
+          if (res) {
+            // const { name, status, gender } = res;
+            profileData = {
+              ...profileData,
+              ...res,
+            };
+            console.log(res);
+            dispatch(saveProfile(profileData));
+            dispatch(signin());
+            dispatch(loaded());
+          } else {
+            addUser(profileData).then((res) => {
+              dispatch(saveProfile(profileData));
+              dispatch(signin());
+              dispatch(loaded());
+            });
+          }
+        });
       })
       .catch(function (error) {
         // An error occurred
+        console.log(error.message);
         alert("Something went wrong!");
       });
   };
@@ -71,7 +87,6 @@ const AuthProvider = () => {
       url: "https://randomuser.me/api/",
       dataType: "json",
       success: function (data) {
-        
         const { name, gender, picture } = data.results[0];
         const profileData = {
           name: `${name.title} ${name.first} ${name.last}`,
@@ -96,6 +111,7 @@ const AuthProvider = () => {
             dispatch(loaded());
           })
           .catch((err) => {
+            console.log(err.message);
             alert("Something went wrong!");
           });
       },

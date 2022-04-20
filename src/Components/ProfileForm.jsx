@@ -88,7 +88,7 @@ const ProfileForm = ({ setVisible }) => {
       return;
     }
     console.log(values);
-    const { name, gender, status, image } = values;
+    const { name, gender, status } = values;
     const data = {
       name,
       gender,

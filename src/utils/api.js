@@ -6,7 +6,7 @@ import "firebase/database";
 
 const Api = () => {
   const dispatch = useDispatch();
-  const randomUserId = useSelector(state => state.userId)
+  const randomUserId = useSelector((state) => state.userId);
   const addUser = async (profileData) => {
     return new Promise((resolve, reject) => {
       if (firebase.auth().currentUser !== null) {
@@ -24,7 +24,6 @@ const Api = () => {
       const userRef = firebase.database().ref("Users").push();
       console.log("ADDING USER");
       console.log(userRef.key);
-      // dispatch(saveId(userRef.key));
       const id = userRef.key;
       userRef.set({
         ...profileData,
@@ -39,13 +38,13 @@ const Api = () => {
 
   const getAllUser = async () => {
     return new Promise((resolve, reject) => {
-      const userRef = firebase.database().ref("Users");
+      const userRef = firebase.database().ref("Users").orderByChild('likes');
       userRef.on("value", (snapshot) => {
         const data = snapshot.val();
         console.log("GETTING ALL USERS");
-        console.log(data);
-
-        resolve(data);
+        console.log(data)
+        resolve(new Map([...Object.entries(data)].sort((a, b) => b[1]['likes'] - a[1]['likes'])));
+        // resolve(data);
       });
     });
   };
@@ -58,7 +57,6 @@ const Api = () => {
         const data = snapshot.val();
         console.log("GETTING USER");
         console.log(data);
-        // dispatch
         resolve(data);
       });
     });
@@ -67,7 +65,8 @@ const Api = () => {
   const updateUser = async (profileData) => {
     return new Promise((resolve, reject) => {
       dispatch(loading());
-
+      console.log("UPDATING USER");
+      console.log(profileData);
       if (firebase.auth().currentUser !== null) {
         const userId = firebase.auth().currentUser.uid;
         const userRef = firebase.database().ref("Users/" + userId);
@@ -83,13 +82,14 @@ const Api = () => {
         });
       } else {
         const data = JSON.parse(window.localStorage["user_profile"]);
-        const userId = randomUserId
+        const userId = randomUserId || data["user_id"];
         const userRef = firebase.database().ref("Users/" + userId);
         getUser(userId).then((res) => {
           console.log(res);
           const newData = {
             ...res,
             ...profileData,
+            user_id: userId,
           };
           userRef.update(newData);
           window.localStorage.setItem("user_profile", JSON.stringify(newData));
@@ -102,11 +102,37 @@ const Api = () => {
     });
   };
 
+  const reactToProfile = async (id, action, val) => {
+    return new Promise((resolve, reject) => {
+      dispatch(loading());
+      const userRef = firebase.database().ref("Users/" + id);
+      
+      getUser(id).then((res) => {
+        console.log(res);
+        const newData = {
+          ...res,
+        };
+
+        if (action === "like") {
+          newData["likes"] = val + 1;
+        } else newData["unlikes"] = val + 1;
+
+        userRef.update(newData);
+        setTimeout(() => {
+          dispatch(loaded());
+
+        }, 1000)
+        resolve(true);
+      });
+    });
+  };
+
   return {
     addUser,
     getAllUser,
     getUser,
     updateUser,
+    reactToProfile,
   };
 };
 

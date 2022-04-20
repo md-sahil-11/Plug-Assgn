@@ -19,8 +19,13 @@ const Home = () => {
 
   useEffect(() => {
       // dispatch(loading());
+      const users = {}
       getAllUser().then(res => {
-        setUserList(res);
+        // console.log(res);
+        for (let [key, val] of res) {
+          users[key] = val
+        }
+        setUserList(users);
         // dispatch(loaded());
       });
   }, [isLogged, isLoading])
@@ -72,7 +77,7 @@ const Home = () => {
                 <Row gutter={[16, { xs: 8, sm: 16, md: 24, lg: 32 }]}>
                   {Object.entries(userList)?.map(([key, val]) => (
                     <Col key={key} xs={24} sm={12} className="gutter-row">
-                      {Object.keys(userList).length && <ProfileBody id={key} {...val} />}
+                      {Object.entries(userList)?.length && <ProfileBody id={key} {...val} />}
                     </Col>
                   ))}
                 </Row>

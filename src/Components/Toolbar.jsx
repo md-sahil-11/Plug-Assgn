@@ -40,14 +40,16 @@ const ToolBar = () => {
   return (
     <div>
       <div className="d-flex-hz">
-      <Button type="primary" shape="round" size="large">
+      {/* <Button type="primary" shape="round" size="large">
           All
-        </Button>
-        <div onClick={showModal}>
+        </Button> */}
+        <div >
           <UserAvatar />
         </div>
-        <Button type="primary" shape="round" size="large">
-          Favourites
+        &nbsp;
+        &nbsp;
+        <Button type="primary" shape="round" size="large" onClick={showModal}>
+          Settings
         </Button>
       </div>
       
